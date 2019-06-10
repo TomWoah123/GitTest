@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Location
+comment1.params=x\ y
+comment1.target=Location(int,\ int)
+comment2.params=
+comment2.target=java.lang.String\ toString()
+comment3.params=
+comment3.target=int\ hashCode()
+comment4.params=other
+comment4.target=boolean\ equals(Location)
+numComments=5
