@@ -7,7 +7,7 @@ public class MyWorld extends World
     public MyWorld()
     {    
         super(961, 604, 1);
-        randomLocations( 60 );
+        randomLocations( 10 );
     }
     
     public void act()
@@ -77,27 +77,26 @@ public class MyWorld extends World
         return edges;
     }
     
-    public void prims()
+    public void primsAlgorithm()
     {
         List<Location> locs = getObjects( Location.class );
         List<Edge> edges = buildAllEdges();
         Collections.sort( edges );
         Stack<Location> covered = new Stack<>();
         Location start = locs.get( ( int ) ( Math.random() * locs.size() ) );
-        int size = locs.size();
         locs.remove( start );
         covered.push( start );
         for ( int i = 0; i < edges.size(); i++ )
         {
-            if ( edges.get( i ).getLocationOne().equals( start ) &&
-                !covered.contains( edges.get( i ).getLocationTwo() ) )
+            if ( !covered.contains( edges.get( i ).getLocationOne() ) && 
+                 covered.contains( edges.get( i ).getLocationTwo() ) )
             {
                 edges.get( i ).show( this );
-                covered.push( edges.get( i ).getLocationTwo() );
-                start = edges.get( i ).getLocationTwo();
+                covered.push( edges.get( i ).getLocationOne() );
                 edges.remove( edges.get( i ) );
-                locs.remove( edges.get( i ).getLocationTwo() );
-                if ( covered.size() == size )
+                locs.remove( edges.get( i ).getLocationOne() );
+                Greenfoot.delay( 5 );
+                if ( locs.size() == 0 )
                 {
                     return;
                 }
@@ -106,15 +105,15 @@ public class MyWorld extends World
                     i = 0;
                 }
             }
-            else if ( edges.get( i ).getLocationTwo().equals( start ) && 
-                     !covered.contains( edges.get( i ).getLocationOne() ) )
+            else if ( !covered.contains( edges.get( i ).getLocationTwo() ) &&
+                      covered.contains( edges.get( i ).getLocationOne() ) )
             {
                 edges.get( i ).show( this );
-                covered.push( edges.get( i ).getLocationOne() );
-                start = edges.get( i ).getLocationOne();
+                covered.push( edges.get( i ).getLocationTwo() );
                 edges.remove( edges.get( i ) );
-                locs.remove( edges.get( i ).getLocationOne() );
-                if ( covered.size() == size )
+                locs.remove( edges.get( i ).getLocationTwo() );
+                Greenfoot.delay( 5 );
+                if ( locs.size() == 0 )
                 {
                     return;
                 }
@@ -125,5 +124,35 @@ public class MyWorld extends World
             }
         }
     }
+    
+    public void kruskalsAlgorithm()
+    {
+        List<Location> locs = getObjects( Location.class );
+        List<Edge> edges = buildAllEdges();
+        Collections.sort( edges );
+        List<Location> covered = new ArrayList<>();
+        for ( int i = 0; i < edges.size(); i++ )
+        {
+            if ( !covered.contains( edges.get( i ).getLocationOne() ) ||
+                 !covered.contains( edges.get( i ).getLocationTwo() ) )
+            {
+                edges.get( i ).show( this );
+                covered.add( edges.get( i ).getLocationOne() );
+                covered.add( edges.get( i ).getLocationTwo() );
+                Greenfoot.delay( 5 );
+                if ( locs.contains( edges.get( i ).getLocationOne() ) )
+                {
+                    locs.remove( edges.get( i ).getLocationOne() );
+                }
+                if ( locs.contains( edges.get( i ).getLocationTwo() ) )
+                {
+                    locs.remove( edges.get( i ).getLocationTwo() );
+                }
+                if ( locs.size() == 0 )
+                {
+                    return;
+                }
+            }
+        }
+    }
 }
-
