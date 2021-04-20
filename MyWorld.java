@@ -7,7 +7,7 @@ public class MyWorld extends World
     public MyWorld()
     {    
         super(961, 604, 1);
-        randomLocations( 10 );
+        randomLocations( 50 );
     }
     
     public void act()
@@ -130,28 +130,61 @@ public class MyWorld extends World
         List<Location> locs = getObjects( Location.class );
         List<Edge> edges = buildAllEdges();
         Collections.sort( edges );
-        List<Location> covered = new ArrayList<>();
-        for ( int i = 0; i < edges.size(); i++ )
+        List<List<Location>> components = new ArrayList<>();
+        for (Edge e : edges)
         {
-            if ( !covered.contains( edges.get( i ).getLocationOne() ) ||
-                 !covered.contains( edges.get( i ).getLocationTwo() ) )
+            Location startNode = e.getLocationOne();
+            Location endNode = e.getLocationTwo();
+            List<Location> startComponent = null;
+            List<Location> endComponent = null;
+            for (List<Location> component : components)
             {
-                edges.get( i ).show( this );
-                covered.add( edges.get( i ).getLocationOne() );
-                covered.add( edges.get( i ).getLocationTwo() );
-                Greenfoot.delay( 5 );
-                if ( locs.contains( edges.get( i ).getLocationOne() ) )
+                if (component.contains(startNode))
                 {
-                    locs.remove( edges.get( i ).getLocationOne() );
+                    startComponent = component;
                 }
-                if ( locs.contains( edges.get( i ).getLocationTwo() ) )
+                if (component.contains(endNode))
                 {
-                    locs.remove( edges.get( i ).getLocationTwo() );
+                    endComponent = component;
                 }
-                if ( locs.size() == 0 )
+            }
+            if (startComponent != null && startComponent.equals(endComponent))
+            {
+                continue;
+            }
+            if (startComponent == null && endComponent == null)
+            {
+                List<Location> newComponent = new ArrayList<>();
+                newComponent.add(startNode);
+                newComponent.add(endNode);
+                components.add(newComponent);
+                e.show(this);
+                Greenfoot.delay(5);
+            }
+            if (startComponent != null && endComponent == null)
+            {
+                int index = components.indexOf(startComponent);
+                components.get(index).add(endNode);
+                e.show(this);
+                Greenfoot.delay(5);
+            }
+            if (startComponent == null && endComponent != null)
+            {
+                int index = components.indexOf(endComponent);
+                components.get(index).add(startNode);
+                e.show(this);
+                Greenfoot.delay(5);
+            }
+            if (startComponent != null && endComponent != null && !startComponent.equals(endComponent))
+            {
+                int index = components.indexOf(startComponent);
+                for (Location loc : endComponent)
                 {
-                    return;
+                    components.get(index).add(loc);
                 }
+                components.remove(endComponent);
+                e.show(this);
+                Greenfoot.delay(5);
             }
         }
     }
